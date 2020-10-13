@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.7.0)
-project(SMF VERSION "0.1.0" LANGUAGES CXX C)
+project(SMFC VERSION "0.1.0" LANGUAGES CXX C)
 
 list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/)
 
@@ -15,12 +15,12 @@ endif()
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-option(SMF_BUILD_PROGRAMS "Build smf programs and demos" ON)
+option(SMF_BUILD_PROGRAMS "Build smf programs and demos" OFF)
 option(SMF_ENABLE_INTEGRATION_TESTS "control if integrations are bulit and ran" ON)
 option(SMF_ENABLE_UNIT_TESTS "control if unit tests are bulit and ran" ON)
 option(SMF_ENABLE_BENCHMARK_TESTS "control if benchmarks are bulit and ran" OFF)
 option(SMF_INSTALL "Enable installation of smf" ON)
-option(SMF_ENABLE_TESTS "Useful for disabling all tests" ON)
+option(SMF_ENABLE_TESTS "Useful for disabling all tests" OFF)
 option(SMF_MANAGE_DEPS "Use smf's reproducible build" OFF)
 
 if(SMF_MANAGE_DEPS)
@@ -54,7 +54,6 @@ if(SMF_MANAGE_DEPS)
   list(APPEND CMAKE_PREFIX_PATH "${SMF_DEPS_INSTALL_DIR}")
 endif()
 
-find_package(Seastar REQUIRED)
 find_package(Flatbuffers REQUIRED)
 find_package(gflags REQUIRED)
 find_package(glog REQUIRED)
@@ -63,9 +62,6 @@ find_package(Boost COMPONENTS
   filesystem
   REQUIRED)
 find_package (Threads)
-find_package(Hdrhistogram REQUIRED)
-find_package(xxHash REQUIRED)
-find_package(Zstd REQUIRED)
 
 if(NOT SMF_ENABLE_TESTS)
   set(SMF_ENABLE_INTEGRATION_TESTS  OFF)
@@ -93,10 +89,7 @@ endif()
 if(SMF_INSTALL)
   include(GNUInstallDirs)
   include(CMakePackageConfigHelpers)
-  set(install_cmakedir ${CMAKE_INSTALL_LIBDIR}/cmake/smf)
-  install(
-    DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/src/include/
-    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+  set(install_cmakedir ${CMAKE_INSTALL_LIBDIR}/cmake/smfc)
   install(
     EXPORT smf-export
     FILE smfTargets.cmake
@@ -114,14 +107,7 @@ if(SMF_INSTALL)
     FILES
     ${CMAKE_CURRENT_BINARY_DIR}/smf-config.cmake
     ${CMAKE_CURRENT_SOURCE_DIR}/cmake/smfc_generator.cmake
-    ${CMAKE_CURRENT_SOURCE_DIR}/cmake/FindZstd.cmake
-    ${CMAKE_CURRENT_SOURCE_DIR}/cmake/FindxxHash.cmake
-    ${CMAKE_CURRENT_SOURCE_DIR}/cmake/FindHdrhistogram.cmake
     ${CMAKE_CURRENT_SOURCE_DIR}/cmake/FindFlatbuffers.cmake
     DESTINATION ${install_cmakedir})
-  export(
-    EXPORT smf-export
-    FILE ${CMAKE_CURRENT_BINARY_DIR}/smfTargets.cmake
-    NAMESPACE smf::)
-  export(PACKAGE smf)
+  export(PACKAGE smfc)
 endif()
