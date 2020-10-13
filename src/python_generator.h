@@ -1,6 +1,5 @@
-// Copyright 2018 SMF Authors
+// Copyright 2019 SMF Authors
 //
-
 #pragma once
 #include <sstream>
 #include <string>
@@ -9,20 +8,17 @@
 #include <boost/filesystem.hpp>
 
 #include "generator.h"
-#include "smf/std-compat.h"
 
 namespace smf_gen {
 
-class go_generator : public generator {
+class python_generator final : public generator {
  public:
-  go_generator(const flatbuffers::Parser &p, const std::string &ifname,
-               const std::string &output_dir)
+  python_generator(const flatbuffers::Parser &p, const std::string &ifname,
+                   const std::string &output_dir)
     : generator(p, ifname, output_dir) {
-    // go uses tabs
-    printer_.set_indent_char('\t');
-    printer_.set_indent_step(1);
+    printer_.set_indent_char(' ');
+    printer_.set_indent_step(4);
   }
-  virtual ~go_generator() = default;
 
   virtual std::string
   output_filename() final {
@@ -31,16 +27,16 @@ class go_generator : public generator {
     for (auto i = 0u; i < package_parts().size(); ++i) {
       str << package_parts()[i] << "/";
     }
-    str << input_filename_without_ext() + ".smf.fb.go";
+    str << input_filename_without_ext() + "_smf_client.py";
     return str.str();
   }
 
-  virtual smf::compat::optional<std::string>
+  virtual std::optional<std::string>
   gen() final {
     generate_header_prologue();
     generate_header_includes();
     generate_header_services();
-    // for Go make sure that the directories exist
+    // for Python make sure that the directories exist
     boost::filesystem::create_directories(
       boost::algorithm::join(package_parts(), "/"));
     return save_conents_to_file();
